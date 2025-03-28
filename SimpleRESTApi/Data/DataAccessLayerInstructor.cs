@@ -14,7 +14,7 @@ namespace SimpleRESTApi.Data
             _instructors.AddRange(
                 new Instructor 
                 { 
-                    InstructorID = 1, 
+                    InstructorId = 1, 
                     InstructorName = "John Doe", 
                     InstructorEmail = "john.doe@gmail.com",
                     InstructorPhone = "123-456-7890",
@@ -23,7 +23,7 @@ namespace SimpleRESTApi.Data
                 },
                 new Instructor 
                 { 
-                    InstructorID = 2, 
+                    InstructorId = 2, 
                     InstructorName = "Jane Geez", 
                     InstructorEmail = "jane.geez@gmail.com",
                     InstructorPhone = "135-246-7890",
@@ -32,7 +32,7 @@ namespace SimpleRESTApi.Data
                 },
                 new Instructor 
                 { 
-                    InstructorID = 3, 
+                    InstructorId = 3, 
                     InstructorName = "Jack White", 
                     InstructorEmail = "jack.white@gmail.com",
                     InstructorPhone = "987-654-3210",
@@ -41,7 +41,7 @@ namespace SimpleRESTApi.Data
                 },
                 new Instructor
                 {
-                    InstructorID = 4,
+                    InstructorId = 4,
                     InstructorName = "Jill Bub",
                     InstructorEmail = "jill.bub@gmail.com",
                     InstructorPhone = "975-864-3210",
@@ -50,7 +50,7 @@ namespace SimpleRESTApi.Data
                 },
                 new Instructor
                 {
-                    InstructorID = 5,
+                    InstructorId = 5,
                     InstructorName = "Idris Elba",
                     InstructorEmail = "idris.elba@gmail.com",
                     InstructorPhone = "333-444-5555",
@@ -59,7 +59,7 @@ namespace SimpleRESTApi.Data
                 },
                 new Instructor
                 {
-                    InstructorID = 6,
+                    InstructorId = 6,
                     InstructorName = "Tomb Ngeheng",
                     InstructorEmail = "tomb.ngeheng@gmail.com",
                     InstructorPhone = "666-777-8888",
@@ -68,7 +68,7 @@ namespace SimpleRESTApi.Data
                 },
                 new Instructor
                 {
-                    InstructorID = 7,
+                    InstructorId = 7,
                     InstructorName = "Dave Eros",
                     InstructorEmail = "dave.eros@gmail.com",
                     InstructorPhone = "999-000-1111",
@@ -76,7 +76,7 @@ namespace SimpleRESTApi.Data
                     InstructorCity = "Berlin"
                 });
         }
-        public Instructor AddInstructor(Instructor instructor)
+        public Instructor AddInstructorAsync(Instructor instructor)
         {
             _instructors.Add(instructor);
             return instructor;
@@ -90,7 +90,7 @@ namespace SimpleRESTApi.Data
 
         public Instructor GetInstructorById(int id)
         {
-            var instructor = _instructors.FirstOrDefault(i => i.InstructorID == id);
+            var instructor = _instructors.FirstOrDefault(i => i.InstructorId == id);
             if(instructor == null)
             {
                 throw new Exception("Instructor not found");
@@ -105,7 +105,7 @@ namespace SimpleRESTApi.Data
 
         public Instructor UpdateInstructor(Instructor instructor)
         {
-            var existingInstructor = GetInstructorById(instructor.InstructorID);
+            var existingInstructor = GetInstructorById(instructor.InstructorId);
             if(existingInstructor == null)
             {
                 throw new Exception("Instructor not found");

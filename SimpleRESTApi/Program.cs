@@ -1,16 +1,17 @@
-using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using SimpleRESTApi.Data;
 using SimpleRESTApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
 
-//Dependency Injection
-builder.Services.AddSingleton<interfaceCategory, DataAccessLayerCategory>();
-builder.Services.AddSingleton<interfaceInstructor, DataAccessLayerInstructor>();
+// Dependency injection 
+builder.Services.AddScoped<IInstructor, InstructorADO>();
+builder.Services.AddSingleton<Icategory, CategoryADO>();
+builder.Services.AddSingleton<ICourse, CourseADO>();
 
 var app = builder.Build();
 
@@ -21,122 +22,103 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthorization();
 
-// app.MapGet("api/v1/helloservices", (string?id) => $"Hello ASP Web API: id={id}");
-
-// app.MapGet("api/v1/helloservices/{name}", (string name) => $"Hello {name}!");
-
-// app.MapGet("api/v1/luas-segitiga", (double alas, double tinggi)
-//  =>{
-//     double luas = 0.5 * alas * tinggi;
-//     return $"Luas segitiga dengan alas = {alas} dan tinggi = {tinggi} adalah {luas} ";
-//  });
-
-// app.MapGet("api/v1/categories/{id}",(ICategory categoryData, int id)=>
-// {
-//     var category = categoryData.GetCategoryById(id);
-//     return category;
-// });
-
-// app.MapPost("api/v1/categories", (ICategory categoryData, Category category) =>
-// {
-//     var newCategory = categoryData.AddCategory(category);
-//     return newCategory;
-// });
-
-// app.MapPut("api/v1/categories", (ICategory categoryData, Category category) =>
-// {
-//     var updatedCategory = categoryData.UpdateCategory(category);
-//     return updatedCategory;
-// });
-
-
-app.MapPut("api/v1/categories", (interfaceCategory categoryData, Category category) =>
-{
-    return categoryData.UpdateCategory(category);
-});
-
-app.MapDelete("api/v1/categories/{id}", (interfaceCategory categoryData, int id) =>
-{
-    categoryData.DeleteCategory(id);
-    return Results.Ok("Category deleted");
-});
-
-app.MapGet("api/v1/categories", (interfaceCategory categoryData) =>
+// Categories API
+app.MapGet("api/v1/categories", (Icategory categoryData) =>
 {
     var categories = categoryData.GetCategories();
-    return categories;
+    return Results.Ok(categories);
 });
 
-app.MapGet("api/v1/categories/{id}", (interfaceCategory categoryData, int id) =>
+app.MapGet("api/v1/categories/{id}", (Icategory categoryData, int id) =>
 {
     var category = categoryData.GetCategoryById(id);
-    return category;
+    return category is not null ? Results.Ok(category) : Results.NotFound();
 });
 
-app.MapPost("api/v1/categories", (interfaceCategory categoryData, Category category) =>
+app.MapPost("api/v1/categories", (Icategory categoryData, Category category) =>
 {
     var newCategory = categoryData.AddCategory(category);
-    return newCategory;
+    return Results.Created($"/api/v1/categories/{newCategory.CategoryId}", newCategory);
 });
 
-app.MapGet("api/v1/instructors", (interfaceInstructor InstructorData) =>
+app.MapPut("api/v1/categories", (Icategory categoryData, Category category) =>
 {
-    var instructors = InstructorData.GetInstructors();
-    return instructors;
+    var updatedCategory = categoryData.UpdateCategory(category);
+    return Results.Ok(updatedCategory);
 });
 
-app.MapGet("api/v1/instructors/{id}", (interfaceInstructor InstructorData, int id) =>
+app.MapDelete("api/v1/categories/{id}", (Icategory categoryData, int id) =>
 {
-    var instructor = InstructorData.GetInstructorById(id);
-    return instructor;
+    categoryData.DeleteCategory(id);
+    return Results.NoContent();
 });
 
-app.MapPost("api/v1/instructors", (interfaceInstructor InstructorData, Instructor instructor) =>
+// Instructors API
+app.MapGet("api/v1/instructors", (IInstructor instructorData) =>
 {
-    var newInstructor = InstructorData.AddInstructor(instructor);
-    return newInstructor;
+    var instructors = instructorData.GetInstructors();
+    return Results.Ok(instructors);
 });
 
-app.MapPut("api/v1/instructors", (interfaceInstructor InstructorData, Instructor instructor) =>
+app.MapGet("api/v1/instructors/{id}", (IInstructor instructorData, int id) =>
 {
-    return InstructorData.UpdateInstructor(instructor);
+    var instructor = instructorData.GetInstructorById(id);
+    return instructor is not null ? Results.Ok(instructor) : Results.NotFound();
 });
 
-app.MapDelete("api/v1/instructors/{id}", (interfaceInstructor InstructorData, int id) =>
+app.MapPost("api/v1/instructors", (IInstructor instructorData, Instructor instructor) =>
 {
-    InstructorData.DeleteInstructor(id);
-    return "Instructor deleted";
+    var newInstructor = instructorData.AddInstructor(instructor);
+    return Results.Created($"/api/v1/instructors/{newInstructor.InstructorId}", newInstructor);
+});
+
+app.MapPut("api/v1/instructors", (IInstructor instructorData, Instructor instructor) =>
+{
+    var updatedInstructor = instructorData.UpdateInstructor(instructor);
+    return Results.Ok(updatedInstructor);
+});
+
+app.MapDelete("api/v1/instructors/{id}", (IInstructor instructorData, int id) =>
+{
+    instructorData.DeleteInstructor(id);
+    return Results.NoContent();
+});
+
+app.MapGet("api/v1/courses", (ICourse courseData) =>
+{
+    var courses = courseData.GetCourses();
+    return courses;
+});
+
+app.MapGet("api/v1/courses/{id}", (ICourse courseData, int id) =>
+{
+    var course = courseData.GetCourseById(id);
+    return course is not null ? Results.Ok(course) : Results.NotFound();
+});
+
+app.MapPost("api/v1/courses", (ICourse courseData, Course course) =>
+{
+    var newCourse = courseData.AddCourse(course);
+    return newCourse;
+});
+
+app.MapPut("api/v1/courses", (ICourse courseData, Course course) =>
+{
+    var updatedCourse = courseData.UpdateCourse(course);
+    return updatedCourse;
+});
+
+app.MapDelete("api/v1/courses/{id}", (ICourse courseData, int id) =>
+{
+    courseData.DeleteCourse(id);
+    return Results.NoContent();
 });
 
 app.Run();
 
-// var summaries = new[]
-// {
-//     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-// };
-
-// app.MapGet("/weatherforecast", () =>
-// {
-//     /// <summary>
-//     /// Generates an array of WeatherForecast objects with random temperature and summary values.
-//     /// </summary>
-//     /// <returns>An array of WeatherForecast objects.</returns>
-//     var forecast =  Enumerable.Range(1, 5).Select(index =>
-//         new WeatherForecast
-//         (
-//             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-//             Random.Shared.Next(-20, 55),
-//             summaries[Random.Shared.Next(summaries.Length)]
-//         ))
-//         .ToArray();
-//     return forecast;
-// })
-// .WithName("GetWeatherForecast");
-
-// app.Run();
-
-// record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-// {
-//     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-// }
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}

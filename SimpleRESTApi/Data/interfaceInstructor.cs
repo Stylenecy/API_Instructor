@@ -10,7 +10,7 @@ namespace SimpleRESTApi.Data
     {
         public List<Instructor> GetInstructors();
         public Instructor GetInstructorById(int id);
-        public Instructor AddInstructor(Instructor instructor);
+        public Instructor AddInstructorAsync(Instructor instructor);
         public Instructor UpdateInstructor(Instructor instructor);
         public void DeleteInstructor(int instructorId);
     }
